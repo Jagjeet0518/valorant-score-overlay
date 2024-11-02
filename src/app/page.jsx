@@ -17,9 +17,9 @@ const convertSecondsToTime = (seconds) => {
 	const minutes = Math.floor(seconds / 60);
 	const remainingSeconds = seconds % 60;
 	// 00:00 format
-	return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+	return { text: `${minutes.toString().padStart(2, "0")}:${remainingSeconds
 		.toString()
-		.padStart(2, "0")}`;
+		.padStart(2, "0")}`, color: seconds > 15 ? "text-white" : "text-red-500" };
 };
 
 const Page = () => {
@@ -45,7 +45,10 @@ const Page = () => {
 		},
 	});
 
-	const [timer, setTimer] = useState("--:--");
+	const [timer, setTimer] = useState({
+		text: ":--:--",
+		color: "text-white",
+	});
 
 	const [roundWonDots, setRoundWonDots] = useState({
 		team1: [],
@@ -61,22 +64,22 @@ const Page = () => {
 		setData();
 		setInterval(() => {
 			setData();
-		}, 1000);
+		}, 250);
 	}, []);
 
 	useEffect(() => {
 		let time = gameStates[gameState.stage] ?? 0;
 		setTimer(convertSecondsToTime(time));
 		const interval = setInterval(() => {
-      if (time > 0) {
-        time--;
-        setTimer(convertSecondsToTime(time));
+			if (time > 0) {
+				time--;
+				setTimer(convertSecondsToTime(time));
 			} else {
 				clearInterval(interval);
 			}
 		}, 1000);
 
-    return () => clearInterval(interval);
+		return () => clearInterval(interval);
 	}, [gameState.stage]);
 
 	useEffect(() => {
@@ -92,15 +95,9 @@ const Page = () => {
 		});
 	}, [gameState.total_games, gameState.team_1.won, gameState.team_2.won]);
 
-  useEffect(() => {
-    if (gameState.switchSides) {
-
-    }
-  }, [gameState.switchSides]);
-
 	return (
 		<>
-			<div id="left-team" className={`team-container left-team ${gameState.switchSides ? "red-team" : "green-team"}`}>
+			<div id="left-team" className={`team-container mr-2 left-team ${gameState.switchSides ? "red-team" : "green-team"}`}>
 				<div className="team-information-container">
 					<img
 						className="team-icon"
@@ -122,39 +119,37 @@ const Page = () => {
 				<span id="round-counter" className="round-counter">
 					Round {gameState.round}
 				</span>
-				<span className="timer" id="timer">
-					<span className="text-white">{timer}</span>
-				</span>
+				{/* <span className="timer" id="timer">
+					<span className={timer.color}>{timer.text}</span>
+				</span> */}
 			</div>
 
 			<div className="spike-container">
-				<div className={`attack-indicator left-pol ${gameState.switchSides ? "" : "hidden"}`}></div>
+				<div className={`attack-indicator left-pol ${gameState.switchSides ? "opacity-100" : "opacity-0"}`}></div>
 				<div id="spike" className="spike-image"></div>
-				<div className={`attack-indicator right-pol ${gameState.switchSides ? "hidden" : ""}`}></div>
+				<div className={`attack-indicator right-pol ${gameState.switchSides ? "opacity-0`" : "opacity-100"}`}></div>
 			</div>
 
 			<div className="maps-won-container">
 				<div className="flex gap-2">
 					{roundWonDots.team1.map((dot, i) => (
 						<div
-							className={`map-won-point ${
-								dot ? "full-point" : ""
-							}`}
+							className={`map-won-point ${dot ? "full-point" : ""
+								}`}
 							key={i}></div>
 					))}
 				</div>
 				<div className="flex gap-2">
 					{roundWonDots.team2.map((dot, i) => (
 						<div
-							className={`map-won-point ${
-								dot ? "full-point" : ""
-							}`}
+							className={`map-won-point ${dot ? "full-point" : ""
+								}`}
 							key={i}></div>
 					))}
 				</div>
 			</div>
 
-			<div id="right-team" className={`team-container right-team ${gameState.switchSides ? "green-team" : "red-team"}`}>
+			<div id="right-team" className={`team-container ml-2 right-team ${gameState.switchSides ? "green-team" : "red-team"}`}>
 				<div className="team-information-container">
 					<img
 						className="team-icon"

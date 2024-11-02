@@ -4,11 +4,11 @@
 
 :root {
 	--overlay_black: #181818;
-	--overlay_dark: #232323cb;
+	--overlay_dark: #232323;
 	--map_select_light_trans: #43434300;
-	--overlay_green: #71edc0;
+	--overlay_green: #666d55;
 	--overlay_trans_green: #397b63b5;
-	--overlay_red: #eb535d;
+	--overlay_red: #b24232;
 	--overlay_trans_red: #913238ad;
 }
 /*------ UTILITY CLASSES ------*/
@@ -19,22 +19,20 @@ body {
 	padding: 0px;
 	margin: 0;
 	font-family: "Montserrat";
-	/*background-image: url('https://sm.ign.com/t/ign_br/screenshot/a/a-gameplay/a-gameplay-screenshot-of-from-valorants-closed-beta_z548.1080.jpg');*/
+	/* background-image: url('https://cdn.discordapp.com/attachments/1176633598514843759/1302345278522785863/image.png?ex=6727c70e&is=6726758e&hm=86ca1c971b66a6dac2ca87561a06bb04c9265004fd1495b59c067bb0531a8d67&'); */
 	background-color: rgb(0, 0, 0);
 	background-size: 100%;
 	display: flex;
 	align-items: flex-start;
 	justify-content: center;
-	/* gap: 10px; */
+	
 }
 body::after,
 body::before {
 	padding: 0px;
 }
-.flex {
-	display: flex;
-	padding: 0;
-}
+
+
 .central-game-timer {
 	position: relative;
 }
@@ -47,7 +45,7 @@ body::before {
 	--transparent: var(--overlay_trans_green);
 }
 .team-container {
-	margin-top: 5px;
+	margin-top: 8px;
 	display: flex;
 	align-items: center;
 	position: relative;
@@ -106,7 +104,7 @@ body::before {
 	height: 100%;
 }
 .team-container .score-holder {
-	background-color: var(--transparent);
+	background-color: var(--color);
 	height: 100%;
 	width: 70px;
 	display: flex;
@@ -134,7 +132,7 @@ body::before {
 .maps-won-container {
 	position: absolute;
 	height: 15px;
-	top: 70px;
+	top: 80px;
 	left: 50%;
 	transform: translateX(-50%);
 	display: flex;
@@ -143,16 +141,12 @@ body::before {
 }
 
 .map-won-point {
-	--side-length: 13px;
-	background-color: var(--overlay_green);
+	--side-length: 10px;
+	background-color: transparent;
+  border: 1px solid white;
 	height: var(--side-length);
 	width: var(--side-length);
-	clip-path: polygon(
-		0px calc(50%),
-		calc(50%) 0px,
-		calc(100%) calc(50%),
-		calc(50%) calc(100%)
-	);
+	transform: rotate(45deg);
 	z-index: 99999;
 	background-color: #75757577;
 }
@@ -161,11 +155,11 @@ body::before {
 }
 
 .central-game-timer {
-	background-color: var(--overlay_dark);
+	background-color: #0f1923;
 	width: 220px;
-	height: 65px;
+	height: 26px;
 	box-sizing: border-box;
-	padding: 5px 25px;
+	padding: 4px 25px;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -177,13 +171,11 @@ body::before {
 		20px calc(100%)
 	);
 	position: relative;
-  margin-left: 1rem;
-  margin-right: 1rem;
 }
 .central-game-timer .round-counter {
 	color: lightgray;
 	font-weight: 600;
-	font-size: small;
+	font-size: 16px;
 }
 .central-game-timer .timer {
 	color: #fff;
@@ -203,7 +195,7 @@ body::before {
 	display: flex;
 	gap: 20px;
 	align-items: center;
-	top: 75px;
+	top: 85px;
 	left: 50%;
 	transform: translateX(-50%);
 }
