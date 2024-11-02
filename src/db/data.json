@@ -1,0 +1,20 @@
+{
+    "round": 1,
+    "stage": "idle",
+    "switchSides": false,
+    "spike_down": false,
+    "team_1": {
+        "abbr": "HEL",
+        "seed": "",
+        "icon": "",
+        "won": 0,
+        "score": 0
+    },
+    "team_2": {
+        "abbr": "PRX",
+        "seed": "",
+        "icon": "",
+        "won": 0,
+        "score": 0
+    }
+}

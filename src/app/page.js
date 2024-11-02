@@ -1,101 +1,178 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+import { useEffect, useState } from "react";
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
-}
+const getRoundsArray = (roundWon, totalRounds) =>
+	Array.from({ length: totalRounds }, (_, i) => (i < roundWon ? 1 : 0));
+
+const gameStates = {
+	buy: 30,
+	fight: 100,
+	spike: 45,
+	post: 6,
+	idle: 0,
+};
+// format --:--
+const convertSecondsToTime = (seconds) => {
+	const minutes = Math.floor(seconds / 60);
+	const remainingSeconds = seconds % 60;
+	// 00:00 format
+	return `${minutes.toString().padStart(2, "0")}:${remainingSeconds
+		.toString()
+		.padStart(2, "0")}`;
+};
+
+const Page = () => {
+	const [gameState, setGameState] = useState({
+		round: 0,
+		stage: "idle",
+		switchSides: false,
+		spike_down: false,
+		total_games: 3,
+		team_1: {
+			abbr: "",
+			seed: "",
+			icon: "",
+			won: 0,
+			score: 0,
+		},
+		team_2: {
+			abbr: "",
+			seed: "",
+			icon: "",
+			won: 0,
+			score: 0,
+		},
+	});
+
+	const [timer, setTimer] = useState("--:--");
+
+	const [roundWonDots, setRoundWonDots] = useState({
+		team1: [],
+		team2: [],
+	});
+
+	useEffect(() => {
+		const setData = async () => {
+			const res = await fetch("http://localhost:3002/data");
+			const data = await res.json();
+			setGameState(data);
+		};
+		setData();
+		setInterval(() => {
+			setData();
+		}, 1000);
+	}, []);
+
+	useEffect(() => {
+		let time = gameStates[gameState.stage] ?? 0;
+		setTimer(convertSecondsToTime(time));
+		const interval = setInterval(() => {
+      if (time > 0) {
+        time--;
+        setTimer(convertSecondsToTime(time));
+			} else {
+				clearInterval(interval);
+			}
+		}, 1000);
+
+    return () => clearInterval(interval);
+	}, [gameState.stage]);
+
+	useEffect(() => {
+		setRoundWonDots({
+			team1: getRoundsArray(
+				gameState.team_1.won,
+				Math.ceil(gameState.total_games / 2)
+			),
+			team2: getRoundsArray(
+				gameState.team_2.won,
+				Math.ceil(gameState.total_games / 2)
+			),
+		});
+	}, [gameState.total_games, gameState.team_1.won, gameState.team_2.won]);
+
+  useEffect(() => {
+    if (gameState.switchSides) {
+
+    }
+  }, [gameState.switchSides]);
+
+	return (
+		<>
+			<div id="left-team" className={`team-container left-team ${gameState.switchSides ? "red-team" : "green-team"}`}>
+				<div className="team-information-container">
+					<img
+						className="team-icon"
+						src={gameState.team_1.icon || "blue.jpg"}
+						alt=""
+					/>
+					<span className="team-name-and-seed">
+						<span className="name">{gameState.team_1.abbr}</span>
+						<span className="seed">{gameState.team_1.seed}</span>
+					</span>
+				</div>
+				<div className="color-separator-bar"></div>
+				<div className="score-holder">
+					<span className="score">{gameState.team_1.score}</span>
+				</div>
+			</div>
+
+			<div className="central-game-timer">
+				<span id="round-counter" className="round-counter">
+					Round {gameState.round}
+				</span>
+				<span className="timer" id="timer">
+					<span className="text-white">{timer}</span>
+				</span>
+			</div>
+
+			<div className="spike-container">
+				<div className={`attack-indicator left-pol ${gameState.switchSides ? "" : "hidden"}`}></div>
+				<div id="spike" className="spike-image"></div>
+				<div className={`attack-indicator right-pol ${gameState.switchSides ? "hidden" : ""}`}></div>
+			</div>
+
+			<div className="maps-won-container">
+				<div className="flex gap-2">
+					{roundWonDots.team1.map((dot, i) => (
+						<div
+							className={`map-won-point ${
+								dot ? "full-point" : ""
+							}`}
+							key={i}></div>
+					))}
+				</div>
+				<div className="flex gap-2">
+					{roundWonDots.team2.map((dot, i) => (
+						<div
+							className={`map-won-point ${
+								dot ? "full-point" : ""
+							}`}
+							key={i}></div>
+					))}
+				</div>
+			</div>
+
+			<div id="right-team" className={`team-container right-team ${gameState.switchSides ? "green-team" : "red-team"}`}>
+				<div className="team-information-container">
+					<img
+						className="team-icon"
+						src={gameState.team_2.icon || "red.jpg"}
+						alt=""
+					/>
+					<span className="team-name-and-seed">
+						<span className="name">{gameState.team_2.abbr}</span>
+						<span className="seed">{gameState.team_2.seed}</span>
+					</span>
+				</div>
+				<div className="color-separator-bar"></div>
+				<div className="score-holder">
+					<span className="score">{gameState.team_2.score}</span>
+				</div>
+			</div>
+		</>
+	);
+};
+
+export default Page;
